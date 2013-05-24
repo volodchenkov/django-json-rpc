@@ -11,12 +11,6 @@ class ServiceProxy(object):
         self.version = str(version)
         self.service_url = service_url
         self.service_name = service_name
-        opener = urllib2.build_opener()
-        opener.addheaders = [
-            ('Accept', 'application/json'),
-            ('Content-Type', 'application/json')
-        ]
-        self.opener = opener
 
     def __getattr__(self, name):
         if self.service_name is not None:
@@ -30,7 +24,12 @@ class ServiceProxy(object):
 
     def send_payload(self, params):
         """Performs the actual sending action and returns the result"""
-        return self.opener.open(
+        opener = urllib2.build_opener()
+        opener.addheaders = [
+            ('Accept', 'application/json'),
+            ('Content-Type', 'application/json')
+        ]
+        return opener.open(
             self.service_url,
             dumps({
                 "jsonrpc": self.version,
