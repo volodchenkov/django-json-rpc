@@ -24,19 +24,19 @@ class ServiceProxy(object):
 
     def send_payload(self, params):
         """Performs the actual sending action and returns the result"""
+
+        data = dumps({
+            "jsonrpc": self.version,
+            "method": self.service_name,
+            'params': params,
+            'id': str(uuid.uuid1()),
+        })
+        request = urllib2.Request(self.service_url, data=data, headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        })
         opener = urllib2.build_opener()
-        opener.addheaders = [
-            ('Accept', 'application/json'),
-            ('Content-Type', 'application/json')
-        ]
-        return opener.open(
-            self.service_url,
-            dumps({
-                "jsonrpc": self.version,
-                "method": self.service_name,
-                'params': params,
-                'id': str(uuid.uuid1())
-        })).read()
+        return opener.open(request).read()
 
     def __call__(self, *args, **kwargs):
         params = kwargs if len(kwargs) else args
